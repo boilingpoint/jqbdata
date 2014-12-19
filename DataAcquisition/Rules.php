@@ -3,7 +3,10 @@ namespace JingqubaoScript\DataAcquisition;
 
 class Rules {
     private $ruleList = array();
+    protected $snoopyObj = null;
     public function Rules() {
+        require_once $dir."\snoopy-master\Snoopy.class.php";
+        $snoopyObj = new Snoopy;
         $ruleList = array(
             'meta_title'=>'<title>(.*)</title>',
             'meta_keywords'=>'<meta name="keywords" content="(.*)" />',

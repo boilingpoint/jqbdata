@@ -364,6 +364,9 @@ class Snoopy
     function fetchStripText($document) {
         return $this->_striptext($document);
     }
+    function fetchStripLink($document) {
+        return $this->_striplinks($document);
+    }
 
     /*======================================================================*\
         Function:	submitlinks
