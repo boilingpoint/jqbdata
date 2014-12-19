@@ -1,5 +1,5 @@
 <?php
-namespace \JingqubaoScript\DataAcquisition;
+namespace JingqubaoScript\DataAcquisition;
 
 class Rules {
     private $ruleList = array();

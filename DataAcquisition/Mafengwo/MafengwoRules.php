@@ -1,6 +1,8 @@
 <?php
 
-namespace \JingqubaoScript\DataAcquisition\Rules;
+namespace JingqubaoScript\DataAcquisition\Mafentwo;
+
+use JingqubaoScript\DataAcquisition\Rules;
 
 class MafengwoRules extends Rules {
     private $ruleList;
