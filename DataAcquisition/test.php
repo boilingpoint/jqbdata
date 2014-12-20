@@ -1,15 +1,20 @@
 <?php
-namespace JingqubaoScript\DataAcquisition;
-use JingqubaoScript\DataAcquisition\Ctrip\CtripRules;
+require_once "Ctrip\CtripRules.php";
+require_once "Mafengwo\MafengwoRules.php";
+//namespace JingqubaoScript\DataAcquisition;
+//use JingqubaoScript\DataAcquisition\Ctrip\CtripRules;
 class test{
     function execute() {
-        $rules = new CtripRules(null);
-        $list = $rules->getQuestionList('凤凰岭');
+        $rules = new MafengwoRules();
+        //$list = $rules->getQuestionList('圆明园');
+        $answers = $rules->getAnswers(1014877);
         return $list;
     }
 }
 $test = new test();
 $list = $test->execute();
+
+file_put_contents('D:/result.txt', var_export($list, true));exit;
 var_dump($list);exit;
 $dir = dirname(__FILE__);
 include $dir."\snoopy-master\Snoopy.class.php";
