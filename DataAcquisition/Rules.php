@@ -1,6 +1,6 @@
 <?php
 //namespace JingqubaoScript\DataAcquisition;
-require_once dirname(__FILE__)."\snoopy-master\Snoopy.class.php";
+require_once __DIR__."\snoopy-master\Snoopy.class.php";
 class Rules {
     private $ruleList = array();
     protected $snoopyObj = null;

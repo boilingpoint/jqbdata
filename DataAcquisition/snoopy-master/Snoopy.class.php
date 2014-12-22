@@ -643,7 +643,8 @@ class Snoopy
             $headers .= "User-Agent: " . $this->agent . "\r\n";
         if (!empty($this->accept))
             $headers .= "Accept: " . $this->accept . "\r\n";
-        if ($this->use_gzip) {
+        //同程采集数据，解压出现问题
+        if ($this->use_gzip && strpos($URI, 'www.ly.com') == false) {
             // make sure PHP was built with --with-zlib
             // and we can handle gzipp'ed data
             if (function_exists('gzinflate')) {
@@ -759,7 +760,7 @@ class Snoopy
         // gunzip
         if ($is_gzipped) {
             // per http://www.php.net/manual/en/function.gzencode.php
-            $results = substr($results, 10);
+            $results = substr($results, 10);   
             $results = gzinflate($results);
         }
 

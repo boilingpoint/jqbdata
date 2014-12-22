@@ -1,6 +1,6 @@
 <?php
 //namespace JingqubaoScript\DataAcquisition\Ctrip;
-require_once dirname(__FILE__)."/../Rules.php";
+require_once __DIR__."/../Rules.php";
 //use JingqubaoScript\DataAcquisition\Rules;
 
 class CtripRules extends Rules {
@@ -12,8 +12,10 @@ class CtripRules extends Rules {
     private $questionAnswersRegStr = "'<\s*ul\s.*?class\s*=\"otheranswer_con\">(.*?)</ul>[^<]*?</div>'isx";
     private $questionAnswerRegStr = "'<\s*li\s*>(.*?)</div>[^<]*?</li>'isx";
     private $questionAnswerTextRegStr = "'<\s*p\s.*?class=\"answer_text\">(.*?)</p>'isx";
-    private $answerCommentsRegStr = "'<\s*ul\s.*?class\s*=\"answer_comment_list\">(.*?)</ul>'isx";
+    private $answerCommentsBlockRegStr = "'<\s*ul\s.*?class\s*=\"answer_comment_list\">(.*?)</ul>'isx";
+    private $answerCommentsRegStr = "'<\s*li\s*>(.*?)</li>'isx";
     private $answerCommentRegStr = "'<\s*p\s.*?class\s*=\"comment_text\">(.*?)</p>'isx";
+    private $userIdRegStr = "'<\s*a\s[^>]*?href=\"\/members\/([^>]*?)\/qa\"'isx";//<a href="/members/5825870081BA4F93989F8ACFC56C81E9/qa" target="_blank" class="ask_username">sleeping_li</a>
     
     public function __construct() {
         parent::__construct();
@@ -29,8 +31,8 @@ class CtripRules extends Rules {
         //
     }
     
-    public function getQuestionList($keyword) {
-        $keyword = urlencode($keyword);
+    public function getQuestionList($scenicName) {
+        $keyword = urlencode($scenicName);
         $questionPageList = $this->getQuestionPagesList($keyword);
         foreach($questionPageList as $pageUrl) {
             $this->snoopyObj->fetch($pageUrl);
@@ -49,7 +51,9 @@ class CtripRules extends Rules {
         foreach($questionUrlList as $questionUrl) {
             $document = $this->getQuestion($questionUrl);
             $questionList[] = array(
+                'ScenicName'=>$scenicName,
                 'Title'=>$this->getTitle($document),
+                'User'=>$this->getUserId($document),
                 'Desc'=>$this->getDesc($document),
                 'Answer'=>$this->getAnswers($document)
             );
@@ -112,6 +116,13 @@ class CtripRules extends Rules {
         }
         return "";
     }
+    public function getUserId($document) {
+         preg_match($this->userIdRegStr, $document, $contents);
+        if(is_array($contents) && count($contents) > 1) {
+            return $contents[1];
+        }
+        return ""; 
+    }
     public function getTitle($document) {
         return $this->getContent($this->questionTitleRegStr, $document);
     }
@@ -128,6 +139,7 @@ class CtripRules extends Rules {
             if(is_array($answersBlock) && count($answersBlock) > 0 && count($answersBlock[1]) > 0) {
                 foreach($answersBlock[1] as $answerBlock) {
                     $answers[] = array(
+                        'User'=>$this->getUserId($answerBlock),
                         'Content'=>$this->getContent($this->questionAnswerTextRegStr, $answerBlock),
                         'Comment'=>$this->getComments($answerBlock)
                     );
@@ -138,15 +150,25 @@ class CtripRules extends Rules {
     }
     
     public function getComments($document) {
-        preg_match($this->answerCommentsRegStr, $document, $commentsBlock);
-        if(is_array($commentsBlock) && count($commentsBlock) > 0 && count($commentsBlock[1]) > 0) {
-            foreach($commentsBlock as $commentBlock) {
-                $comment = $this->getContent($this->answerCommentRegStr, $commentBlock);
-                if(!empty($comment)) {
-                    $comments[] = $comment;
-                }
+        preg_match($this->answerCommentsBlockRegStr, $document, $commentsBlock);
+        if(!is_array($commentsBlock) || count($commentsBlock) <= 1 || count($commentsBlock[1]) <= 0) {
+            return null;
+        }
+        preg_match_all($this->answerCommentsRegStr, $commentsBlock[1], $commentsLi);
+               
+        if(!is_array($commentsLi) || count($commentsLi) <= 1 || count($commentsLi[1]) <= 0) {
+            return null;
+        }
+        foreach ($commentsLi[1] as $commentBlock) {
+            $comment = $this->getContent($this->answerCommentRegStr, $commentBlock);
+            if (!empty($comment)) {
+                $comments[] = array(
+                    'User'=>$this->getUserId($commentBlock),
+                    'Content'=>$comment
+                );
             }
         }
+
         return $comments;
     }
     

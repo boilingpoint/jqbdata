@@ -1,20 +1,40 @@
 <?php
+//define("BaseDir", __DIR__.'/../');
+//set_include_path(BaseDir);
 require_once "Ctrip\CtripRules.php";
 require_once "Mafengwo\MafengwoRules.php";
+require_once "Ly\LyRules.php";
+require_once "Ctrip\CtripQuestionService.php";
+require_once "Ctrip\CtripQuestionDocument.php";
+
 //namespace JingqubaoScript\DataAcquisition;
 //use JingqubaoScript\DataAcquisition\Ctrip\CtripRules;
-class test{
-    function execute() {
-        $rules = new MafengwoRules();
-        //$list = $rules->getQuestionList('圆明园');
-        $answers = $rules->getAnswers(1014877);
-        return $list;
-    }
-}
-$test = new test();
-$list = $test->execute();
+//class test{
+//    function execute() {
+//        
+////        $rules = new CtripRules();
+////        $list = $rules->getQuestionList('凤凰岭');
+//        $rules = new MafengwoRules();
+//        //$list = $rules->getQuestionList('圆明园');
+//        $answers = $rules->getAnswers(1014877);
+//        return $answers;
+//    }
+//}
 
-file_put_contents('D:/result.txt', var_export($list, true));exit;
+//        $rules = new CtripRules();
+//        $list = $rules->getQuestionList('凤凰岭');
+//        
+//        foreach($list as $q) {
+//            $document = new CtripQuestionDocument($q);
+//            CtripQuestionService::saveQuestion($document);
+//        }
+//        var_dump('success');exit;
+
+$rules = new LyRules();
+$list = $rules->getScenicList();
+
+
+file_put_contents('D:/ly.txt', var_export($list, true));exit;
 var_dump($list);exit;
 $dir = dirname(__FILE__);
 include $dir."\snoopy-master\Snoopy.class.php";

@@ -1,7 +1,7 @@
 <?php
 
 //namespace JingqubaoScript\DataAcquisition\Mafentwo;
-require_once dirname(__FILE__)."/../Rules.php";
+require_once __DIR__."/../Rules.php";
 //use JingqubaoScript\DataAcquisition\Rules;
 
 class MafengwoRules extends Rules {
@@ -17,6 +17,7 @@ class MafengwoRules extends Rules {
     //private $answerPageRegStr = "";
     private $answerCommentsRegStr = "'<\s*ul\s.*?class\s*=\"comment-list\"[^<]*?>(.*?)</ul>'isx";
     private $answerCommentRegStr = "'<\s*dd\s*>(.*?)</dd>'isx";
+    private $userIdRegStr = "'<\s*a\s.*?class=\"level\"\s.*?href=\"\/rank\/lv.php?uid=(.*?)\"\"'isx";//<a class="level" href="/rank/lv.php?uid=19246077" target="_blank" rel="nofollow">LV.3</a>
     
     public function __construct() {
         parent::__construct();
@@ -31,8 +32,8 @@ class MafengwoRules extends Rules {
      * 
      */
         
-    public function getQuestionList($keyword) {
-        $keyword = urlencode($keyword);
+    public function getQuestionList($scenicName) {
+        $keyword = urlencode($scenicName);
         $questionPageList = $this->getQuestionPagesList($keyword);
         foreach($questionPageList as $pageUrl) {
             $this->snoopyObj->fetch($pageUrl);
@@ -52,7 +53,9 @@ class MafengwoRules extends Rules {
         foreach($questionUrlList as $id=>$questionUrl) {
             $document = $this->getQuestion($questionUrl);
             $questionList[] = array(
+                'ScenicName'=>$scenicName,
                 'Title'=>$this->getTitle($document),
+                'User'=>$this->getUserId($document),
                 'Desc'=>$this->getDesc($document),
                 'Answer'=>$this->getAnswers($id)
             );
@@ -103,6 +106,13 @@ class MafengwoRules extends Rules {
         return $questionPageList;
     }
     
+    public function getUserId($document) {
+         preg_match($this->userIdRegStr, $document, $contents);
+        if(is_array($contents) && count($contents) > 1) {
+            return $contents[1];
+        }
+        return ""; 
+    }
     public function getQuestion($url) {
         $this->snoopyObj->fetch($url);
         return $this->snoopyObj->getResults();
@@ -157,6 +167,7 @@ class MafengwoRules extends Rules {
                     foreach($answersBlock[1] as $answerBlock) {
                         $answers[] = array(
                             'Content'=>$this->getContent($this->questionAnswerTextRegStr, $answerBlock),
+                            'User'=>$this->getUserId($answerBlock),
                             'Comment'=>$this->getComments($answerBlock)
                         );
                     }
@@ -168,12 +179,19 @@ class MafengwoRules extends Rules {
     }
     
     public function getComments($document) {
-        preg_match($this->answerCommentsRegStr, $document, $commentsBlock);print_r($commentsBlock);
+        preg_match($this->answerCommentsRegStr, $document, $commentsBlock);
         if(is_array($commentsBlock) && count($commentsBlock) > 0 && count($commentsBlock[1]) > 0) {
-            foreach($commentsBlock as $commentBlock) {
-                $comment = $this->getContent($this->answerCommentRegStr, $commentBlock);
-                if(!empty($comment)) {
-                    $comments[] = $comment;
+            preg_match_all($this->answerCommentRegStr, $commentsBlock[1], $commentsLi);
+            if(is_array($commentsLi) && count($commentsLi) > 1 && count($commentsLi[1]) > 0) {
+                foreach($commentsLi[1] as $commentBlock) {
+                    $comment = preg_replace("'<\s*a\s.*?>(.*?)</a>'isx", "\$1", $commentBlock);
+                    if(!empty($comment)) {
+                        $comment = substr($comment, 0, strpos($comment, '回复'));
+                        $comments[] = array(
+                            //'User'=>$this->getUserId($commentBlock),
+                            'Content'=>$comment    
+                        );
+                    }
                 }
             }
         }
