@@ -4,6 +4,7 @@
 require_once "Ctrip\CtripRules.php";
 require_once "Mafengwo\MafengwoRules.php";
 require_once "Ly\LyRules.php";
+
 require_once "Ctrip\CtripQuestionService.php";
 require_once "Ctrip\CtripQuestionDocument.php";
 
@@ -21,18 +22,21 @@ require_once "Ctrip\CtripQuestionDocument.php";
 //    }
 //}
 
-//        $rules = new CtripRules();
-//        $list = $rules->getQuestionList('凤凰岭');
-//        
-//        foreach($list as $q) {
-//            $document = new CtripQuestionDocument($q);
-//            CtripQuestionService::saveQuestion($document);
-//        }
-//        var_dump('success');exit;
+        $scenics = LyService::find(array('Name'=>array('$ne'=>""),'CtripQuestion'=>array('$exists'=>false)), 
+                array('return_type'=>1,'fields'=>array('ScenicId','Name')));
 
-$rules = new LyRules();
-$list = $rules->getScenicList();
+        foreach($scenics['documents'] as $scenic) {
+            $rules = new CtripRules();
+            $list = $rules->getQuestionList($scenic['Name']);
 
+            LyService::setScenic(array('ScenicId'=>$scenic['ScenicId']), 'CtripQuestion', $list);
+        }
+        
+        var_dump('success');exit;
+
+//$rules = new LyRules();
+//$list = $rules->getScenicList();
+//var_dump('success');exit;
 
 file_put_contents('D:/ly.txt', var_export($list, true));exit;
 var_dump($list);exit;
