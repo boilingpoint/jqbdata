@@ -4,6 +4,7 @@
 require_once "Ctrip\CtripRules.php";
 require_once "Mafengwo\MafengwoRules.php";
 require_once "Ly\LyRules.php";
+
 require_once "Ctrip\CtripQuestionService.php";
 require_once "Ctrip\CtripQuestionDocument.php";
 
@@ -32,7 +33,7 @@ require_once "Ctrip\CtripQuestionDocument.php";
 
 $rules = new LyRules();
 $list = $rules->getScenicList();
-
+var_dump('success');exit;
 
 file_put_contents('D:/ly.txt', var_export($list, true));exit;
 var_dump($list);exit;
