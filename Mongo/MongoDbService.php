@@ -366,7 +366,8 @@ class MongoDbService {
     }
 
     public static function update(array $criteria, array $object, array $options = array()) {
-        return static::getMongoCollection(true)->update($criteria, $object, $options);
+        $col = static::getMongoCollection(true);
+        return @$col->update($criteria, $object, $options);
     }
 
     public static function drop() {

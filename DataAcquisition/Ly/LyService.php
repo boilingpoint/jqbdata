@@ -17,7 +17,7 @@ class LyService extends MongoDbService
     }
     
     public static function setScenic($where, $keyName, $document) {
-        $result = parent::update($where, array('$set'=>array($keyName=>$document)));
+        $result = @parent::update($where, array('$set'=>array($keyName=>$document)));
     }
     
     public static function getQuestions($where, $sort, $fields = array(), $start = 0, $limit = 10) {

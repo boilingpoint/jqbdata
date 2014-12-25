@@ -66,6 +66,7 @@ class Rules {
             "'&O(uml|UML);'",
             "'&U(uml|UML);'",
             "'&szlig;'i",
+            "�",
         );
         $replace = array("",
             "",
@@ -90,6 +91,7 @@ class Rules {
             "Ö",
             "Ü",
             "ß",
+            "",
         );
 
         $text = preg_replace($search, $replace, $document);

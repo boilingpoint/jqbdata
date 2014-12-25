@@ -59,6 +59,7 @@ class MafengwoRules extends Rules {
                 'Desc'=>$this->getDesc($document),
                 'Answer'=>$this->getAnswers($id)
             );
+            sleep(1);
         }
         return $questionList;
     }

@@ -1,6 +1,9 @@
 <?php
 //define("BaseDir", __DIR__.'/../');
 //set_include_path(BaseDir);
+
+ini_set('error_log', 'D:/error_log.txt');
+
 require_once "Ctrip\CtripRules.php";
 require_once "Mafengwo\MafengwoRules.php";
 require_once "Ly\LyRules.php";
@@ -22,15 +25,24 @@ require_once "Ctrip\CtripQuestionDocument.php";
 //    }
 //}
 
-        $scenics = LyService::find(array('Name'=>array('$ne'=>""),'CtripQuestion'=>array('$exists'=>false)), 
+        $scenics = LyService::find(array('Name'=>array('$ne'=>""),'MafengwoQuestion'=>array('$exists'=>false)), 
                 array('return_type'=>1,'fields'=>array('ScenicId','Name')));
 
         foreach($scenics['documents'] as $scenic) {
+            if($scenic['ScenicId'] == 311) {
+                continue;
+            }
             $rules = new CtripRules();
-            $list = $rules->getQuestionList($scenic['Name']);
-var_dump('success');exit;
+            $list = @$rules->getQuestionList($scenic['Name']);
 
-            LyService::setScenic(array('ScenicId'=>$scenic['ScenicId']), 'CtripQuestion', $list);
+            if($list != null && $list != false) {file_put_contents("D:/result.txt",var_export($list, true));
+                @LyService::setScenic(array('ScenicId'=>$scenic['ScenicId']), 'CtripQuestion', $list);
+            }
+//            $mafengwoRules = new MafengwoRules();
+//            $mafengList = @$mafengwoRules->getQuestionList($scenic['Name']);
+//            if($mafengList != null && $mafengList != false) {
+//                @LyService::setScenic(array('ScenicId'=>$scenic['ScenicId']), 'MafengwoQuestion', $mafengList);
+//            }
         }
         
         var_dump('success');exit;
