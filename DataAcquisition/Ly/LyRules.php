@@ -17,7 +17,7 @@ class LyRules extends Rules {
     private $scenicPhoneRegStr = "'<\s*div\s.*?class\s*=\s*\"positionAddress\">.*?<span>.*?电话[:：]([0-9\-\—]*?)]'isx";
     private $scenicFaxRegStr = "'<\s*div\s.*?class\s*=\s*\"positionAddress\">.*?<span>.*?传真[:：]([0-9\-\—]*?)]'isx";
     private $scenicIntroRegStr = "'<\s*div\s.*?class\s*=\"left_con\">(.*?)</div>'isx";
-    private $startId = 8413;//34;
+    private $startId = 34;
     private $endId = 32638;
     
     public function __construct() {

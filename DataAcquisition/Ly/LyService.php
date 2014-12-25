@@ -16,7 +16,11 @@ class LyService extends MongoDbService
         return $code;
     }
     
-    public static function getScenic($where, $sort, $fields = array(), $start = 0, $limit = 10) {
+    public static function setScenic($where, $keyName, $document) {
+        $result = parent::update($where, array('$set'=>array($keyName=>$document)));
+    }
+    
+    public static function getQuestions($where, $sort, $fields = array(), $start = 0, $limit = 10) {
         
         $ret = self::fetchAll($where, $fields)->sort($sort)->skip($start)->limit($limit);
         if($ret == null) {
@@ -34,4 +38,3 @@ class LyService extends MongoDbService
         );
     }
 }
-

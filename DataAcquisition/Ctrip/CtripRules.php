@@ -34,6 +34,9 @@ class CtripRules extends Rules {
     public function getQuestionList($scenicName) {
         $keyword = urlencode($scenicName);
         $questionPageList = $this->getQuestionPagesList($keyword);
+        if($questionPageList == null) {
+            return null;
+        }
         foreach($questionPageList as $pageUrl) {
             $this->snoopyObj->fetch($pageUrl);
             $document = $this->snoopyObj->getResults();
@@ -47,16 +50,20 @@ class CtripRules extends Rules {
                 }
             }
         }
-        
+        if($questionUrlList == null || count($questionUrlList) == 0) {
+            return null;
+        }
         foreach($questionUrlList as $questionUrl) {
             $document = $this->getQuestion($questionUrl);
-            $questionList[] = array(
+            $question = array(
                 'ScenicName'=>$scenicName,
                 'Title'=>$this->getTitle($document),
                 'User'=>$this->getUserId($document),
                 'Desc'=>$this->getDesc($document),
                 'Answer'=>$this->getAnswers($document)
             );
+            $questionList[] = $question;
+            sleep(1);
         }
         return $questionList;
     }
