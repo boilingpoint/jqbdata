@@ -36,9 +36,37 @@ class Rules {
         return $ruleList;
     }
     
+    protected function _replaceNonUTF8($str) {  
+        //去除非UTF8字符，这种方式，还需完善字符集
+        $str = json_encode($str);
+        $search = array(
+            "\\ufffd",
+            "\\u256d",
+            "\\u256e",
+            "\\u0437",
+            "\\u300d",
+            "\\u2220",
+            "&amp;#176;",
+            "&amp;reg;"
+        );
+        $replace = array(
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+            " ",
+        );
+        $str = str_ireplace($search, $replace, $str);
+        $str = json_decode($str);
+        return $str;
+    }
+    
     protected function _fetchStripText($document)
     {
-
+        $document = $this->_replaceNonUTF8($document);
         // I didn't use preg eval (//e) since that is only available in PHP 4.0.
         // so, list your entities one by one here. I included some of the
         // more common ones.
@@ -66,7 +94,7 @@ class Rules {
             "'&O(uml|UML);'",
             "'&U(uml|UML);'",
             "'&szlig;'i",
-            "�",
+            //"�",
         );
         $replace = array("",
             "",
@@ -91,7 +119,7 @@ class Rules {
             "Ö",
             "Ü",
             "ß",
-            "",
+            //"",
         );
 
         $text = preg_replace($search, $replace, $document);

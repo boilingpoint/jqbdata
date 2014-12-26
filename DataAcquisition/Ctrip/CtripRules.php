@@ -145,9 +145,11 @@ class CtripRules extends Rules {
             preg_match_all($this->questionAnswerRegStr, $titles[1][0], $answersBlock);
             if(is_array($answersBlock) && count($answersBlock) > 0 && count($answersBlock[1]) > 0) {
                 foreach($answersBlock[1] as $answerBlock) {
+                    $content = $this->getContent($this->questionAnswerTextRegStr, $answerBlock);
+                    $content = $this->_replaceNonUTF8($content);
                     $answers[] = array(
                         'User'=>$this->getUserId($answerBlock),
-                        'Content'=>$this->getContent($this->questionAnswerTextRegStr, $answerBlock),
+                        'Content'=>$content,
                         'Comment'=>$this->getComments($answerBlock)
                     );
                 }
@@ -168,6 +170,7 @@ class CtripRules extends Rules {
         }
         foreach ($commentsLi[1] as $commentBlock) {
             $comment = $this->getContent($this->answerCommentRegStr, $commentBlock);
+            $comment = $this->_replaceNonUTF8($comment);
             if (!empty($comment)) {
                 $comments[] = array(
                     'User'=>$this->getUserId($commentBlock),

@@ -166,8 +166,10 @@ class MafengwoRules extends Rules {
                 preg_match_all($this->questionAnswerRegStr, $documentArray['payload']['list_html'], $answersBlock);
                 if(is_array($answersBlock) && count($answersBlock) > 0 && count($answersBlock[1]) > 0) {
                     foreach($answersBlock[1] as $answerBlock) {
+                        $content = $this->getContent($this->questionAnswerTextRegStr, $answerBlock);
+                        $content = $this->_replaceNonUTF8($content);
                         $answers[] = array(
-                            'Content'=>$this->getContent($this->questionAnswerTextRegStr, $answerBlock),
+                            'Content'=>$content,
                             'User'=>$this->getUserId($answerBlock),
                             'Comment'=>$this->getComments($answerBlock)
                         );
@@ -186,6 +188,7 @@ class MafengwoRules extends Rules {
             if(is_array($commentsLi) && count($commentsLi) > 1 && count($commentsLi[1]) > 0) {
                 foreach($commentsLi[1] as $commentBlock) {
                     $comment = preg_replace("'<\s*a\s.*?>(.*?)</a>'isx", "\$1", $commentBlock);
+                    $comment = $this->_replaceNonUTF8($comment);
                     if(!empty($comment)) {
                         $comment = substr($comment, 0, strpos($comment, '回复'));
                         $comments[] = array(
